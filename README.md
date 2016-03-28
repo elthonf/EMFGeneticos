@@ -16,6 +16,7 @@ Pacotes necessários: EMFGeneticos (este pacote) e ggplot2, para o método de pl
 
 ###NAMESPACE published methods:
 - EMF.Gen.Workflow
+- EMF.Gen.Plot
 - EMF.Gen.CrossOver.Simple
 - EMF.Gen.Mutate.Simple
-- EMF.Gen.Plot
+
