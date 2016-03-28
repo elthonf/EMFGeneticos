@@ -14,7 +14,8 @@ Problemas que não necessitem de Cross Over e Mutação específicos podem ser t
 
 Pacotes necessários: EMFGeneticos (este pacote) e ggplot2, para o método de plotagem de gráfico EMF.Gen.Plot.
 
-- EMF.Gen.Workflow,
-- EMF.Gen.CrossOver.Simple,
-- EMF.Gen.Mutate.Simple,
+#Métodos abertos no NAMESPACE:
+- EMF.Gen.Workflow
+- EMF.Gen.CrossOver.Simple
+- EMF.Gen.Mutate.Simple
 - EMF.Gen.Plot
