@@ -1,6 +1,6 @@
 library(EMFGeneticos)
 library(ggplot2)  # detach(package:ggplot2)
-rm(list=ls())
+rm(list=ls()) #limpa
 
 cat("loading file") #############
 file = "tests/caixeiro/Towns2012.csv"
