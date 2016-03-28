@@ -1,0 +1,11 @@
+Package: EMFGeneticos
+Type: Package
+Title: Algoritmos Genéticos para o curso da USP-EACH
+Version: 0.1
+Date: 2016-03-24
+Author: Elthon Manhas de Freitas <elthon@usp.br>
+Maintainer: Elthon Manhas de Freitas <elthon@usp.br>
+Description: More about what it does (maybe more than one line)
+             Copyright (C) 2016 Elthon Manhas de Freitas
+License: GPL 2.0
+LazyData: TRUE

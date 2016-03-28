@@ -1,0 +1,8 @@
+#exportPattern("^[[:alpha:]]+")
+export(
+
+  EMF.Gen.Workflow,
+  EMF.Gen.CrossOver.Simple,
+  EMF.Gen.Mutate.Simple,
+  EMF.Gen.Plot
+)
