@@ -210,7 +210,7 @@ EMF.Gen.Workflow <- function(
 
     # report on GA settings
     result = list(type="custom chromosome",
-                  #input.params=input.params,
+                  input.params=input.params,
                   cSize=cSize, popSize=popSize,
                   generation=generation,
                   lastPopulation=population,

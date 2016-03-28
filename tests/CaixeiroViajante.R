@@ -94,7 +94,7 @@ caixeiro.mutate <- function(
 
 
 cat("Testing EMF.Gen.Workflow ... \n")
-caixeiroExec <- EMF.Gen.Workflow(
+caixeiroExec4 <- EMF.Gen.Workflow(
     iters = 300,
     popSize = 2000,
     crossOver = 1000,
