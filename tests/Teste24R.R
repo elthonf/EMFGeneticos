@@ -37,12 +37,25 @@ oitoR.print <- function(c){
     return ( m );
 }
 
+oitoR.monitor <- function(r){
+    if( (r$generation >= 10) && ((r$generation %% 10) == 0))
+        EMF.Gen.Plot(r, title = "Solução para as oito rainhas", ylab = "Ameaças");
+
+    if(r$best[r$generation] == 0 )  #STOP
+    {
+        EMF.Gen.Plot(r, title = "Solução para as oito rainhas", ylab = "Ameaças");
+        return (TRUE);
+    }
+
+    return (FALSE);
+}
+
 #oitoR.evaluate(oitoR.generate())
 
 
 cat("Testing EMF.Gen.Workflow ... \n")
-oitoRainhasExec2 <- EMF.Gen.Workflow(
-    iters = 150,
+oitoRainhasExec <- EMF.Gen.Workflow(
+    iters = 10,
     popSize = 2000,
     crossOver = 1000,
     elitism = 1,
@@ -52,6 +65,7 @@ oitoRainhasExec2 <- EMF.Gen.Workflow(
     foreigners = 100,
     chromosomeRandFunc = oitoR.generate,
     evalFunc = oitoR.evaluate,
+    #monitorFunc = oitoR.monitor, #Optional. remove for performance!
     verbose = TRUE)
 
 # oitoRainhasExec$best
@@ -62,25 +76,8 @@ oitoRainhasExec2 <- EMF.Gen.Workflow(
 
 cat("Testing plots ... \n")
 EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças")
-EMF.Gen.Plot(oitoRainhasExec2, title = "Solução para as oito rainhas", ylab = "Ameaças")
 EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças", includeWorst = TRUE)
-EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças", includeWorst = FALSE, includeMean = FALSE)
-EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças", includeWorst = FALSE, includeMean = FALSE, includeBestComparision = FALSE)
+EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças", includeMean = FALSE)
+EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças", includeMean = FALSE, includeBestComparision = FALSE)
 EMF.Gen.Plot(oitoRainhasExec, title = "Solução para as oito rainhas", ylab = "Ameaças", invert = TRUE)
 
-
-cat("Testing EMF.Gen.CrossOver.Simple ... \n")
-p1 = oitoR.generate()
-p2 = oitoR.generate()
-c = EMF.Gen.CrossOver.Simple(p1, p2)
-p1
-p2
-c[2,]
-c[1,]
-
-cat("Testing EMF.Gen.Mutate.Simple ... \n")
-original = oitoR.generate()
-newSample = oitoR.generate()
-
-mutant = EMF.Gen.Mutate.Simple(original, mutationRate = 0.30, chromosomeRandFunc = oitoR.generate)
-mutant = EMF.Gen.Mutate.Simple(original, mutationRate = 0.40)

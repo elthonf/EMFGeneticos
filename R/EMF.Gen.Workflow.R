@@ -215,9 +215,8 @@ EMF.Gen.Workflow <- function(
                   generation=generation,
                   lastPopulation=population,
                   lastEvaluations=evalVals,
-                  best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals,
-
-                  elitism=elitism                  );
+                  best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals
+                  );
     class(result) = "EMFGeneticos";
 
     return(result);

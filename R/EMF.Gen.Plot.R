@@ -29,7 +29,7 @@ EMF.Gen.Plot <- function(
     if(includeStdDev)
         temp <- rbind(temp, data.frame(Generation = c( seq(1, g) ),
                                        Statistic = c(rep("std", g)),
-                                       StatisticalPoints = c( invertValue* dataplot$stdDev[1:g] ) ))
+                                       StatisticalPoints = c( invertValue* dataplot$stdDev[1:g] + invertValue* dataplot$mean[1:g]) ))
 
     minY = min(temp$StatisticalPoints);
     maxY = max(temp$StatisticalPoints);
