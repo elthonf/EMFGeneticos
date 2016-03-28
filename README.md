@@ -1,10 +1,10 @@
 Algoritmos Genéticos em R
 ====
 
-### English:
+### English description
 
 
-### Português:
+### Português description
 Solução de algoritmos genéticos, feito em linguagem R.
 Todo o controle se dá pelo método EMF.Gen.Workflow.
 Exemplos podem ser obtidos na pasta tests.
@@ -14,7 +14,7 @@ Problemas que não necessitem de Cross Over e Mutação específicos podem ser t
 
 Pacotes necessários: EMFGeneticos (este pacote) e ggplot2, para o método de plotagem de gráfico EMF.Gen.Plot.
 
-#####Métodos abertos no NAMESPACE:
+###NAMESPACE published methods:
 - EMF.Gen.Workflow
 - EMF.Gen.CrossOver.Simple
 - EMF.Gen.Mutate.Simple
