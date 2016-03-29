@@ -31,8 +31,8 @@ EMF.Gen.Plot <- function(
                                        Statistic = c(rep("std", g)),
                                        StatisticalPoints = c( invertValue* dataplot$stdDev[1:g] + invertValue* dataplot$mean[1:g]) ))
 
-    minY = min(temp$StatisticalPoints);
-    maxY = max(temp$StatisticalPoints);
+    minY = min(temp$StatisticalPoints, na.rm = TRUE);
+    maxY = max(temp$StatisticalPoints, na.rm = TRUE);
 
     #Prepare basic plot:
     pl <-
@@ -43,7 +43,7 @@ EMF.Gen.Plot <- function(
                colour = Statistic)) +
         geom_line( aes(linetype=Statistic) ) +
         geom_point( aes(shape=Statistic, size=Statistic) ) +
-        scale_x_continuous(limits = c(0,  g)) +
+        scale_x_continuous(limits = c(1,  g)) +
         scale_y_continuous(limits = c( minY - (maxY-minY)*0.05*0.5 * (!invert)*includeBestComparision, maxY + (maxY-minY)*0.05*0.5 * (invert)*includeBestComparision) ) +
         scale_linetype_manual(values=c("mean"="solid", "best"="solid", "worst"="solid", "std"="blank")) +
         scale_shape_manual(values=c("mean"=1, "best"=1, "worst"=1, "std"=20)) +
@@ -58,14 +58,14 @@ EMF.Gen.Plot <- function(
 
     if(includeBestComparision)
     {
-        ybest = min(dataplot$best) * invertValue;
+        ybest = min(dataplot$best, na.rm = TRUE) * invertValue;
 
         pl <- pl +
             #geom_hline(y = max(temp$Survivalpoints), lty = 2, color="gray") +
             geom_hline(yintercept = ybest, lty = 2, color="gray") +
             annotate("text", x = 1, y = ybest - (maxY-minY)*0.025*0.5*invertValue,
                      hjust = 0, size = 3, color = "black",
-                     label = paste("Best solution:", min(dataplot$best) * invertValue) );
+                     label = paste("Best solution:", min(dataplot$best, na.rm = TRUE) * invertValue) );
     }
 
 

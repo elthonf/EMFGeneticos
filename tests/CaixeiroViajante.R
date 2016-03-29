@@ -2,7 +2,8 @@ library(EMFGeneticos)
 library(ggplot2)  # detach(package:ggplot2)
 rm(list=ls()) #limpa
 
-cat("loading file") #############
+############# #############  ############# 1 : CARREGA DADOS!
+cat("loading file")
 file = "tests/caixeiro/Towns2012.csv"
 
 towns = read.delim(file, header = FALSE, sep = "\t", quote = "\"", dec = ".", fill = TRUE, comment.char = "",
@@ -27,8 +28,8 @@ rm(c)
 rm(file)
 
 
-
-cat("Defining custom functions... \n") #############
+############# #############  ############# 2 : DEFINE CUSTOM FUNCTIONS!
+cat("Defining custom functions... \n")
 #Função para gerar um cromossomo aleatório
 caixeiro.generate <- function(){
     r = sample(1:dim(towns)[1],dim(towns)[1])
@@ -92,25 +93,37 @@ caixeiro.mutate <- function(
     return ( EMF.Gen.Mutate.Simple(original = original, chromosomeRandFunc = NULL ));
 }
 
+caixeiro.monitor <- function(r){
+    if( (r$generation >= 10) && ((r$generation %% 10) == 0))
+        EMF.Gen.Plot(r, title = "Solução parcial do caixeiro viajante", ylab = "Distância");
 
-cat("Testing EMF.Gen.Workflow ... \n")
-caixeiroExec4 <- EMF.Gen.Workflow(
+    cat( paste( " Generation: ", r$generation, ", best: ", r$best[ r$generation ], "\n"));
+    return (FALSE);
+}
+
+############# #############  ############# 3 : EXECUTA!
+
+
+cat("Testing EMF.Gen.Workflow ... \n") #################
+caixeiroExec6 <- EMF.Gen.Workflow(
     iters = 300,
     popSize = 2000,
-    crossOver = 1000,
+    crossOver = 5000,
     elitism = 1,
     clone = 1000,
-    cloneAndMutate = 100,
-    mutationChance = 0.00,
+    cloneAndMutate = 300,
+    mutationChance = 0.15,
     foreigners = 100,
     chromosomeRandFunc = caixeiro.generate,
     evalFunc = caixeiro.evaluate,
     crossOverFunc = caixeiro.crossover,
     mutationFunc = caixeiro.mutate,
     monitorFunc = caixeiro.monitor, #Remover para performance
-    verbose = TRUE)
+    verbose = FALSE)
 
 cat("Testing plots ... \n")
 EMF.Gen.Plot(caixeiroExec, title = "Solução para o caixeiro viajante", ylab = "Distância")
 EMF.Gen.Plot(caixeiroExec2, title = "Solução para o caixeiro viajante", ylab = "Distância")
 EMF.Gen.Plot(caixeiroExec3, title = "Solução para o caixeiro viajante", ylab = "Distância")
+EMF.Gen.Plot(caixeiroExec4, title = "Solução para o caixeiro viajante", ylab = "Distância")
+EMF.Gen.Plot(caixeiroExec5, title = "Solução para o caixeiro viajante", ylab = "Distância")

@@ -12,7 +12,11 @@ EMF.Gen.Workflow <- function(
     crossOverFunc = EMF.Gen.CrossOver.Simple,
     mutationFunc = EMF.Gen.Mutate.Simple,
 
-    parentProb = dnorm(1:popSize, mean=0, sd=(popSize/3)), #Probabilidade dos pais serem eleitos
+    parentProb = dnorm(1:popSize, mean=1, sd=(popSize/3)), #Probabilidade dos pais serem eleitos
+    #Alternativas:
+    # dnorm(1:popSize, mean=1, sd=(popSize/3)) -> Divide 30%, 60% e 100% em 63,0%, 29,9% e 07,1%
+    # dnorm(1:popSize, mean=1, sd=(popSize/2)) -> Divide 30%, 60% e 100% em 47,1%, 33,4% e 19,5%
+    # dnorm(1:popSize, mean=1, sd=(popSize/1)) -> Divide 30%, 60% e 100% em 34,5%, 31,6% e 33,9%
     verbose=FALSE
 )
 {
