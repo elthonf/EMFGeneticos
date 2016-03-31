@@ -67,6 +67,10 @@ By default a normal distribution is applyed based on the fitness (evalFunc, fast
 If it is NA, the probability for all chromosomes, to get crossed, is the same (faster).
 If it is NULL, the probability for chromosomes will be based on te fitness (evalFunc).
 }
+  \item{unique}{
+If true the algorithm remove duplicated chromosomes on population.
+By default False.
+}
   \item{verbose}{
 If true the algorithm will be more verbose.
 By default False.

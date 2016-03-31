@@ -18,9 +18,7 @@ distance = matrix(  nrow = dim(towns)[1], ncol = dim(towns)[1])
 
 for(l in 1:dim(towns)[1])
     for(c in 1:dim(towns)[1])
-    {
         distance[l, c] = distanceOnEarth(towns$lat[l], towns$lon[l], towns$lat[c], towns$lon[c]);
-    }
 
 rm(distanceOnEarth)
 rm(l)
@@ -41,7 +39,7 @@ caixeiro.evaluate <- function(c){
     ret = 0
     size=length(c)[1]
 
-    cAux = c( c, c[1])
+    cAux = c( c, c[1]) #Adiciona a volta à origem (opicional)
 
     for(i in 1:size){
         ret = ret + distance[ cAux[i], cAux[i+1]]
@@ -84,6 +82,23 @@ caixeiro.crossover<- function( p1, p2  )
     return ( ret );
 }
 
+caixeiro.menortrip <- function()
+{
+    trip = rep(NA, dim(towns)[1])
+    trip[1] = 25
+    i = 2
+    while(i <= dim(towns)[1] )
+    {
+        destinations = distance[trip[i-1],] #Identify all destinations
+        destinations = sort(destinations, index=TRUE) #Sort destinations
+        availableDestinations = destinations$ix[ !(destinations$ix %in% trip) ]  #Remove visited towns
+
+        trip[i] = availableDestinations[1]
+        i = i +1
+    }
+    return ( trip );
+}
+
 caixeiro.mutate <- function(
     original,
     mutationRate = 0.10,
@@ -97,7 +112,7 @@ caixeiro.monitor <- function(r){
     if( (r$generation >= 10) && ((r$generation %% 10) == 0))
         EMF.Gen.Plot(r, title = "Solução parcial do caixeiro viajante", ylab = "Distância");
 
-    cat( paste( " Generation: ", r$generation, ", best: ", r$best[ r$generation ], "\n"));
+    cat( paste( "[Monitor Message] Generation: ", r$generation, ", best: ", r$best[ r$generation ], "\n"));
     return (FALSE);
 }
 
@@ -106,7 +121,7 @@ caixeiro.monitor <- function(r){
 
 cat("Testing EMF.Gen.Workflow ... \n") #################
 caixeiroExec6 <- EMF.Gen.Workflow(
-    iters = 300,
+    iters = 150,
     popSize = 2000,
     crossOver = 5000,
     elitism = 1,
@@ -127,3 +142,4 @@ EMF.Gen.Plot(caixeiroExec2, title = "Solução para o caixeiro viajante", ylab =
 EMF.Gen.Plot(caixeiroExec3, title = "Solução para o caixeiro viajante", ylab = "Distância")
 EMF.Gen.Plot(caixeiroExec4, title = "Solução para o caixeiro viajante", ylab = "Distância")
 EMF.Gen.Plot(caixeiroExec5, title = "Solução para o caixeiro viajante", ylab = "Distância")
+EMF.Gen.Plot(caixeiroExec6, title = "Solução para o caixeiro viajante", ylab = "Distância")

@@ -17,6 +17,7 @@ EMF.Gen.Workflow <- function(
     # dnorm(1:popSize, mean=1, sd=(popSize/3)) -> Divide 30%, 60% e 100% em 63,0%, 29,9% e 07,1%
     # dnorm(1:popSize, mean=1, sd=(popSize/2)) -> Divide 30%, 60% e 100% em 47,1%, 33,4% e 19,5%
     # dnorm(1:popSize, mean=1, sd=(popSize/1)) -> Divide 30%, 60% e 100% em 34,5%, 31,6% e 33,9%
+    unique=FALSE,
     verbose=FALSE
 )
 {
@@ -31,13 +32,13 @@ EMF.Gen.Workflow <- function(
                         suggestions=suggestions, clone=clone, cloneAndMutate=cloneAndMutate,
                         elitism=elitism, chromosomeRandFunc=chromosomeRandFunc, evalFunc=evalFunc, monitorFunc=monitorFunc,
                         crossOverFunc=crossOverFunc, mutationFunc=mutationFunc,
-                        parentProb=parentProb, verbose=verbose);
+                        parentProb=parentProb, unique=unique, verbose=verbose, startTime=date());
 
     #Discover the chromosome size
     cSize = length( chromosomeRandFunc() )[1];
     if (verbose) cat(paste("Chromosome size:", cSize, "\n"));
 
-    ### ### ### ### ### SECTION 1: INIT THE FISRT POPULATION ### ### ### ### ### ### ### ### ### ###
+    ### ### ### ### ### SECTION 1: INIT THE FIRST POPULATION ### ### ### ### ### ### ### ### ### ###
     if (verbose) cat("Generating the first population...\n");
     population = matrix(nrow=popSize, ncol=cSize); #Empty: Final Population
 
@@ -104,7 +105,8 @@ EMF.Gen.Workflow <- function(
                           generation=generation,
                           lastPopulation=population,
                           lastEvaluations=evalVals,
-                          best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals);
+                          best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals,
+                          time=date());
             class(result) = "EMFGeneticos";
 
             stopFromMonitor = monitorFunc(result);
@@ -160,11 +162,11 @@ EMF.Gen.Workflow <- function(
             if (verbose) cat(paste(" done with ", mutants, " mutants. \n"));
         }
 
-        # 3rd - Clone: Simple clone
+        # 3rd - Clone: Simple clone (Exclude Elite)
         if (clone > 0) {
             if (verbose) cat(paste("  applying perfect clone: ", clone, "item(s) \n"));
 
-            parentIDs = sample(1:popSize, clone, prob= parentProb);
+            parentIDs = sample((elitism+1):popSize, clone, prob= parentProb[(elitism+1):popSize]);
             parents = sortedPopulation[parentIDs,];
 
             newPopulation = rbind( newPopulation, parents);
@@ -196,16 +198,22 @@ EMF.Gen.Workflow <- function(
             }
         }
 
-        # Final: if the next pop isnt enough, force to clone more
+        # Final: if the next pop isnt enough, force to clone more (Exclude elite)
         if( dim(newPopulation)[1] < popSize ) {
             needed = popSize - dim(newPopulation)[1];
             if (verbose) cat(paste("  forcing clone on : ", needed, "item(s) \n"));
 
-            parentIDs = sample(1:popSize, needed, prob= parentProb);
+            parentIDs = sample((elitism+1):popSize, clone, prob= parentProb[(elitism+1):popSize]);
             parents = sortedPopulation[parentIDs,];
 
             newPopulation = rbind( newPopulation, parents);
             newEvalVals = c( newEvalVals, sortedEvaluations$x[parentIDs] );
+        }
+
+        if(unique){
+            newPopulation = unique(newPopulation);
+            newEvalVals = rep(NA, dim(newPopulation)[1]);
+            if(verbose) cat(paste("  items after distinct: ", length(newEvalVals), "\n"));
         }
 
         population = newPopulation;
@@ -219,8 +227,8 @@ EMF.Gen.Workflow <- function(
                   generation=generation,
                   lastPopulation=population,
                   lastEvaluations=evalVals,
-                  best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals
-                  );
+                  best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals,
+                  time=date() );
     class(result) = "EMFGeneticos";
 
     return(result);
