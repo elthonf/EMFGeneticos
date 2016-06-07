@@ -2,12 +2,11 @@ library(EMFGeneticos) #library(ggplot2)  # detach(package:ggplot2)
 rm(list=ls()) #limpa
 
 ############# #############  ############# 0 : CARREGA O PROBLEMA!
-problema <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
-
-problema1 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
-problema2 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
-problema3 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
-problema3 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
+#problema <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
+#problema1 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
+#problema2 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
+#problema3 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
+#problema3 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
 
 
 
@@ -73,7 +72,9 @@ cvrp.corrige <- function(c){
     ret = ret[ret %in% problema$cromossomoAmostra];
     #3 - Identifica Adiciona algo que esteja faltando
     falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% ret];
-    ret = c( ret, sample( falta ) );
+    if( length(falta) > 1 )
+        ret = c( ret, sample( falta ) );
+    ret = c( ret, falta );
 
     return ( ret );
 }

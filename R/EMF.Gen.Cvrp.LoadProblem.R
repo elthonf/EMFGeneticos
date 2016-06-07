@@ -57,7 +57,7 @@ EMF.Gen.Cvrp.LoadProblem <- function(
     ret$veiculos = (ret$dimensoes + 1) : (ret$dimensoes + ret$qtdeVeiculos);
 
     #Cria uma amostra. Obs.: O primeiro veículo não é representado no cromossomo
-    ret$cromossomoAmostra = c( ret$nodes , ret$veiculos[2:ret$qtdeVeiculos] );
+    ret$cromossomoAmostra = c( ret$clientes , ret$veiculos[2:ret$qtdeVeiculos] );
     ret$tamanhoCromossomo = length(ret$cromossomoAmostra);
 
     #Cria a matriz com as distâncias (já deixa calculado para performance)

@@ -1,5 +1,10 @@
 
 #BENCHMARK
+#ff = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/B-n38-k6.vrp", gamaOverCapacity = 3000)
+
+#problema = fff
+
+
 #Estatégia 1: População média (1000), sem elitismo. 50% de CrossOver, 40% clone (reprodução), 10% mutação simples
 cvrp.exec01 <- EMF.Gen.Workflow(
     iters = 100,
