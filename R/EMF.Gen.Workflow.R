@@ -17,7 +17,6 @@ EMF.Gen.Workflow <- function(
     # dnorm(1:popSize, mean=1, sd=(popSize/3)) -> Divide 30%, 60% e 100% em 63,0%, 29,9% e 07,1%
     # dnorm(1:popSize, mean=1, sd=(popSize/2)) -> Divide 30%, 60% e 100% em 47,1%, 33,4% e 19,5%
     # dnorm(1:popSize, mean=1, sd=(popSize/1)) -> Divide 30%, 60% e 100% em 34,5%, 31,6% e 33,9%
-    unique=FALSE,
     verbose=FALSE
 )
 {
@@ -32,13 +31,13 @@ EMF.Gen.Workflow <- function(
                         suggestions=suggestions, clone=clone, cloneAndMutate=cloneAndMutate,
                         elitism=elitism, chromosomeRandFunc=chromosomeRandFunc, evalFunc=evalFunc, monitorFunc=monitorFunc,
                         crossOverFunc=crossOverFunc, mutationFunc=mutationFunc,
-                        parentProb=parentProb, unique=unique, verbose=verbose, startTime=date());
+                        parentProb=parentProb, verbose=verbose, startTime=Sys.time());
 
     #Discover the chromosome size
     cSize = length( chromosomeRandFunc() )[1];
     if (verbose) cat(paste("Chromosome size:", cSize, "\n"));
 
-    ### ### ### ### ### SECTION 1: INIT THE FIRST POPULATION ### ### ### ### ### ### ### ### ### ###
+    ### ### ### ### ### STEP 1: INIT THE FIRST POPULATION ### ### ### ### ### ### ### ### ### ###
     if (verbose) cat("Generating the first population...\n");
     population = matrix(nrow=popSize, ncol=cSize); #Empty: Final Population
 
@@ -106,7 +105,7 @@ EMF.Gen.Workflow <- function(
                           lastPopulation=population,
                           lastEvaluations=evalVals,
                           best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals,
-                          time=date());
+                          time=Sys.time());
             class(result) = "EMFGeneticos";
 
             stopFromMonitor = monitorFunc(result);
@@ -135,30 +134,36 @@ EMF.Gen.Workflow <- function(
         if (crossOver > 1) {
             if (verbose) cat(paste("  applying crossOver: ", crossOver, "item(s) ... "));
             mutants = 0;
-            for(child in seq(from = 1, to = crossOver, by = 2) ) { #Generate 2 children
 
-                # ok, pick two random parents
-                parentIDs = sample(1:popSize, 2, prob= parentProb);
-                parent1 = sortedPopulation[parentIDs[1],];
-                parent2 = sortedPopulation[parentIDs[2],];
-                # crossOver them
-                children = crossOverFunc( parent1, parent2 );
-
-                if(!is.na( mutationChance ) && runif(1) <= mutationChance)
-                {
-                    children[1,] = mutationFunc(original=children[1,], chromosomeRandFunc=chromosomeRandFunc);
-                    mutants = mutants + 1;
-                }
-                if(!is.na( mutationChance ) && runif(1) <= mutationChance)
-                {
-                    children[2,] = mutationFunc(original=children[2,], chromosomeRandFunc=chromosomeRandFunc);
-                    mutants = mutants + 1;
-                }
-
-                newPopulation = rbind( newPopulation, children);
-                newEvalVals = c( newEvalVals, rep(NA, dim(children)[1] ) ); #Compute eval later
-                #if (verbose) cat(".");
+            parentIDs = matrix( nrow = crossOver/2, ncol = 2);
+            if(crossOver >= 5000) #More eficient way to large crossOvers (could repeat)
+            {
+                parentIDs[,1] = sample(1:popSize, crossOver/2, prob= parentProb, replace = TRUE);
+                parentIDs[,2] = sample(1:popSize, crossOver/2, prob= parentProb, replace = TRUE);
             }
+            else{
+                for( i in 1:(crossOver/2)){ #Generate in pairs, distinct parents
+                    parentIDs[i,] = sample(1:popSize, 2, prob= parentProb);
+                }
+            }
+            parents1 = sortedPopulation[parentIDs[,1],];
+            parents2 = sortedPopulation[parentIDs[,2],];
+
+            # crossOver them
+            children = crossOverFunc( parents1, parents2 );
+
+            if(!is.na( mutationChance ))
+            {
+                for(child in 1:dim(children)[1] ) {
+                    if(runif(1) <= mutationChance){
+                        children[child,] = mutationFunc(original=children[child,], chromosomeRandFunc=chromosomeRandFunc);
+                        mutants = mutants + 1;
+                    }
+                }
+            }
+
+            newPopulation = rbind( newPopulation, children);
+            newEvalVals = c( newEvalVals, rep(NA, dim(children)[1] ) ); #Compute eval later
             if (verbose) cat(paste(" done with ", mutants, " mutants. \n"));
         }
 
@@ -177,7 +182,7 @@ EMF.Gen.Workflow <- function(
         if (cloneAndMutate > 0) {
             if (verbose) cat(paste("  applying clone and mutate: ", cloneAndMutate, "item(s) \n"));
 
-            parentIDs = sample(1:popSize, cloneAndMutate, prob= parentProb);
+            parentIDs = sample(1:popSize, cloneAndMutate, prob= parentProb, replace = TRUE);
             parents = sortedPopulation[parentIDs,];
             for(p in 1:cloneAndMutate)
                 parents[p,] = mutationFunc( original=parents[p,], chromosomeRandFunc=chromosomeRandFunc);
@@ -203,17 +208,11 @@ EMF.Gen.Workflow <- function(
             needed = popSize - dim(newPopulation)[1];
             if (verbose) cat(paste("  forcing clone on : ", needed, "item(s) \n"));
 
-            parentIDs = sample((elitism+1):popSize, clone, prob= parentProb[(elitism+1):popSize]);
+            parentIDs = sample((elitism+1):popSize, needed, prob= parentProb[(elitism+1):popSize]);
             parents = sortedPopulation[parentIDs,];
 
             newPopulation = rbind( newPopulation, parents);
             newEvalVals = c( newEvalVals, sortedEvaluations$x[parentIDs] );
-        }
-
-        if(unique){
-            newPopulation = unique(newPopulation);
-            newEvalVals = rep(NA, dim(newPopulation)[1]);
-            if(verbose) cat(paste("  items after distinct: ", length(newEvalVals), "\n"));
         }
 
         population = newPopulation;
@@ -228,7 +227,7 @@ EMF.Gen.Workflow <- function(
                   lastPopulation=population,
                   lastEvaluations=evalVals,
                   best=bestEvals, worst=worstEvals, mean=meanEvals, stdDev=stdDevEvals,
-                  time=date() );
+                  time=Sys.time() );
     class(result) = "EMFGeneticos";
 
     return(result);

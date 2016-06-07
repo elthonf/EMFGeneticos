@@ -44,7 +44,7 @@ The number of chromosomes that are kept into the next generation.
         By default is about 1\% of the population size
 }
   \item{foreigners}{
-The number of new random chromosomes to be inserted in a generation.
+The number of new random chromosomes to be inserted in each generation.
 }
   \item{chromosomeRandFunc}{
 REQUIRED: User supplied method to generate a random chromosome
@@ -66,10 +66,6 @@ ParentProb defines the probability for every population-position, to get crossed
 By default a normal distribution is applyed based on the fitness (evalFunc, fast).
 If it is NA, the probability for all chromosomes, to get crossed, is the same (faster).
 If it is NULL, the probability for chromosomes will be based on te fitness (evalFunc).
-}
-  \item{unique}{
-If true the algorithm remove duplicated chromosomes on population.
-By default False.
 }
   \item{verbose}{
 If true the algorithm will be more verbose.

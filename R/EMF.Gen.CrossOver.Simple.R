@@ -1,5 +1,9 @@
 EMF.Gen.CrossOver.Simple <- function( p1, p2, twoPoints = TRUE, twoPointsOnSmall = FALSE  )
 {
+    #Se não for matriz, transforma em matriz
+    if(!is.matrix(p1)) p1 = matrix(p1, ncol = length(p1));
+    if(!is.matrix(p2)) p2 = matrix(p2, ncol = length(p2));
+
     sizeP1 = length(p1);
     sizeP2 = length(p2);
 
@@ -10,35 +14,47 @@ EMF.Gen.CrossOver.Simple <- function( p1, p2, twoPoints = TRUE, twoPointsOnSmall
         return ( ret );
     }
 
-    if( ( twoPoints && (sizeP1 > 10) ) ||
-        ( twoPointsOnSmall && (sizeP1 > 2)) ) #TWO POINTS
+    pairs = dim(p1)[1]; #How many pairs
+    chromoSize = dim(p1)[2]; #Each chromosome size
+
+    #Prepare the children
+    child1 = matrix( nrow = pairs, ncol = chromoSize);
+    child2 = matrix( nrow = pairs, ncol = chromoSize);
+
+    if( ( twoPoints && (chromoSize > 10) ) ||
+        ( twoPointsOnSmall && (chromoSize > 2)) ) #TWO POINTS CROSSOVER
     {
-        crossOverPoint1 = sample(1:(sizeP1-1),1);
-        crossOverPoint2 = crossOverPoint1;
-        while(crossOverPoint2 == crossOverPoint1)
-        {
-            crossOverPoint2 = sample(1:(sizeP1-1),1);
+        for(i in 1:pairs){
+            crossOverPoints = sample(1:(chromoSize-1), size = 2); #2 distinct points
+
+            cop1 = min(crossOverPoints);
+            cop2 = max(crossOverPoints);
+
+            #cat(cop1);cat(cop2);
+
+            child1[i,] = c( p1[i, 1 : cop1 ], p2[i, (cop1+1) : cop2], p1[i, (cop2+1) : chromoSize] );
+            child2[i,] = c( p2[i, 1 : cop1 ], p1[i, (cop1+1) : cop2], p2[i, (cop2+1) : chromoSize] );
         }
-        cop1 = min(crossOverPoint1, crossOverPoint2);
-        cop2 = max(crossOverPoint1, crossOverPoint2);
-
-        #cat(cop1);cat(cop2);
-
-        child1 = c( p1[ 1 : cop1 ], p2[(cop1+1) : cop2], p1[(cop2+1) : sizeP1] );
-        child2 = c( p2[ 1 : cop1 ], p1[(cop1+1) : cop2], p2[(cop2+1) : sizeP1] );
     }
-    else
+    else #ONE POINT CROSSOVER
     {
-        crossOverPoint = sample(1:(sizeP1-1),1);
+        crossOverPoints = sample(1:(chromoSize-1), pairs, replace = TRUE);
 
-        #p1[ 1 : crossOverPoint ]
-        #p2[ (crossOverPoint+1) : sizeP1 ]
+        for(i in 1:pairs){
+            child1[i,] = c( p1[i, 1:crossOverPoints[i]], p2[i, (crossOverPoints[i]+1):chromoSize] );
+            child2[i,] = c( p2[i, 1:crossOverPoints[i]], p1[i, (crossOverPoints[i]+1):chromoSize] );
+        }
 
-        child1 = c( p1[1:crossOverPoint], p2[(crossOverPoint+1):sizeP1] );
-        child2 = c( p2[1:crossOverPoint], p1[(crossOverPoint+1):sizeP1] );
     }
 
-    ret = matrix( c(child1, child2), nrow = 2, ncol=sizeP1, byrow = TRUE );
-    return ( ret );
-
+    return ( rbind(child1, child2) );
 }
+
+#Para testar
+# p1 = rep(1, 10); p2 = rep(3, 10);
+# EMF.Gen.CrossOver.Uniforme(p1, p2)
+# EMF.Gen.CrossOver.Simple(p1, p2)
+#
+# p1 = rbind( rep(1, 10), rep(2, 10) ); p2 = rbind( rep(3, 10), rep(4, 10) )
+# EMF.Gen.CrossOver.Uniforme(p1, p2)
+# EMF.Gen.CrossOver.Simple(p1, p2)

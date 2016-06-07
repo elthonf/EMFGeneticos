@@ -1,5 +1,4 @@
-library(EMFGeneticos)
-library(ggplot2)  # detach(package:ggplot2)
+library(EMFGeneticos) #library(ggplot2)  # detach(package:ggplot2)
 rm(list=ls())
 
 cat("Defining custom functions... \n")

@@ -3,6 +3,11 @@ export(
 
   EMF.Gen.Workflow,
   EMF.Gen.CrossOver.Simple,
+  EMF.Gen.CrossOver.Uniforme,
+
   EMF.Gen.Mutate.Simple,
-  EMF.Gen.Plot
+  EMF.Gen.Plot,
+  EMF.Gen.LogStatistics,
+
+  EMF.Gen.Cvrp.LoadProblem
 )

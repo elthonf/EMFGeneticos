@@ -38,4 +38,13 @@ caixeiroExec8 <- EMF.Gen.Workflow(
 EMF.Gen.Plot(caixeiroExec6, title = "Solução para o caixeiro viajante", ylab = "Distância")
 EMF.Gen.Plot(caixeiroExec8, title = "Solução para o caixeiro viajante", ylab = "Distância")
 
+requireNamespace("ggplot2")
 
+if (!requireNamespace("ggplot2", quietly = TRUE)) {
+    stop("Pkg needed for this function to work. Please install it.",
+         call. = FALSE)
+}
+
+devtools::use_package("dplyr")
+library(ggplot2)
+detach(package:ggplot2)

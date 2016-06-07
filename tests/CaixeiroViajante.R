@@ -1,5 +1,4 @@
-library(EMFGeneticos)
-library(ggplot2)  # detach(package:ggplot2)
+library(EMFGeneticos) #library(ggplot2)  # detach(package:ggplot2)
 rm(list=ls()) #limpa
 
 ############# #############  ############# 1 : CARREGA DADOS!
