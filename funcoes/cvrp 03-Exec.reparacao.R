@@ -18,16 +18,14 @@ cvrp.exec01 <- EMF.Gen.Workflow(
     cloneAndMutate = 1000 * 0.1,
     chromosomeRandFunc = cvrp.generate,
     evalFunc = cvrp.evaluate,
-    crossOverFunc = EMF.Gen.CrossOver.Simple,
+    crossOverFunc = cvrp.crossover.repara,
     mutationFunc = cvrp.mutate.permut,
     monitorFunc = cvrp.monitor,
     parentProb = dnorm(1:1000, mean=1, sd=(1000/2)),
     verbose = TRUE)
 
-EMF.Gen.Plot(cvrp.exec01, includeWorst = FALSE, title = "Solução para CVRP com operadores clássivos. exec.: 1",
-             ylab = "Fitness", xlab = "Gerações",
-             includeMean = FALSE, includeStdDev = FALSE,
-             minGen = 1, maxGen = max(which( cvrp.exec01$best != Inf )) )
+EMF.Gen.Plot(cvrp.exec01, includeWorst = TRUE, title = "Solução para CVRP com operador de reparação. exec.: 1",
+             ylab = "Fitness", xlab = "Gerações")
 
 
 #Estatégia 2: Instancia A! População grande (10000), sem elitismo. 50% de CrossOver, 40% clone (reprodução), 10% mutação simples
@@ -40,15 +38,13 @@ cvrp.exec02 <- EMF.Gen.Workflow(
     cloneAndMutate = 10000 * 0.1,
     chromosomeRandFunc = cvrp.generate,
     evalFunc = cvrp.evaluate,
-    crossOverFunc = EMF.Gen.CrossOver.Simple,
+    crossOverFunc = cvrp.crossover.repara,
     mutationFunc = cvrp.mutate.permut,
     monitorFunc = cvrp.monitor,
     parentProb = dnorm(1:10000, mean=1, sd=(10000/2)),
     verbose = TRUE)
-EMF.Gen.Plot(cvrp.exec02, includeWorst = FALSE, title = "Solução para CVRP com operadores clássivos. exec.: 2",
-             ylab = "Fitness", xlab = "Gerações",
-             includeMean = FALSE, includeStdDev = FALSE,
-             minGen = 1, maxGen = max(which( cvrp.exec02$best != Inf )) )
+EMF.Gen.Plot(cvrp.exec02, includeWorst = TRUE, title = "Solução para CVRP com operador de reparação. exec.: 2",
+             ylab = "Fitness", xlab = "Gerações")
 
 #Estatégia 3: Instancia P! População grande (10000), sem elitismo. 50% de CrossOver, 40% clone (reprodução), 10% mutação simples
 problema = prob5;
@@ -61,15 +57,14 @@ cvrp.exec03 <- EMF.Gen.Workflow(
     cloneAndMutate = 10000 * 0.1,
     chromosomeRandFunc = cvrp.generate,
     evalFunc = cvrp.evaluate,
-    crossOverFunc = EMF.Gen.CrossOver.Simple,
+    crossOverFunc = cvrp.crossover.repara,
     mutationFunc = cvrp.mutate.permut,
     monitorFunc = cvrp.monitor,
     parentProb = dnorm(1:10000, mean=1, sd=(10000/2)),
     verbose = TRUE)
-EMF.Gen.Plot(cvrp.exec03, includeWorst = FALSE, title = "Solução para CVRP com operadores clássivos. exec.: 3",
-             ylab = "Fitness", xlab = "Gerações",
-             includeMean = FALSE, includeStdDev = FALSE,
-             minGen = 1, maxGen = max(which( cvrp.exec03$best != Inf )) )
+EMF.Gen.Plot(cvrp.exec03, includeWorst = TRUE, title = "Solução para CVRP com operador de reparação. exec.: 3",
+             ylab = "Fitness", xlab = "Gerações")
+
 
 
 #Estatégia 4: Instancia B! População média (1000), COM ELITISMO 50% de CrossOver, 40% clone (reprodução), 10% mutação simples
@@ -83,16 +78,13 @@ cvrp.exec04 <- EMF.Gen.Workflow(
     cloneAndMutate = 1000 * 0.1,
     chromosomeRandFunc = cvrp.generate,
     evalFunc = cvrp.evaluate,
-    crossOverFunc = EMF.Gen.CrossOver.Simple,
+    crossOverFunc = cvrp.crossover.repara,
     mutationFunc = cvrp.mutate.permut,
     monitorFunc = cvrp.monitor,
     parentProb = dnorm(1:1000, mean=1, sd=(1000/2)),
     verbose = TRUE)
-
-EMF.Gen.Plot(cvrp.exec04, includeWorst = FALSE, title = "Solução para CVRP com operadores clássivos. exec.: 4",
-             ylab = "Fitness", xlab = "Gerações",
-             includeMean = FALSE, includeStdDev = FALSE,
-             minGen = 1, maxGen = max(which( cvrp.exec04$best != Inf )) )
+EMF.Gen.Plot(cvrp.exec04, includeWorst = TRUE, title = "Solução para CVRP com operador de reparação. exec.: 4",
+             ylab = "Fitness", xlab = "Gerações")
 
 #Estatégia 5: Instancia de alta dimensionalidade! População grande (10000), sem elitismo. 50% de CrossOver, 40% clone (reprodução), 10% mutação simples
 problema = prob2;
@@ -105,12 +97,10 @@ cvrp.exec05 <- EMF.Gen.Workflow(
     cloneAndMutate = 10000 * 0.1,
     chromosomeRandFunc = cvrp.generate,
     evalFunc = cvrp.evaluate,
-    crossOverFunc = EMF.Gen.CrossOver.Simple,
+    crossOverFunc = cvrp.crossover.repara,
     mutationFunc = cvrp.mutate.permut,
     monitorFunc = cvrp.monitor,
     parentProb = dnorm(1:10000, mean=1, sd=(10000/2)),
     verbose = TRUE)
-EMF.Gen.Plot(cvrp.exec05, includeWorst = FALSE, title = "Solução para CVRP com operadores clássivos. exec.: 5",
-             ylab = "Fitness", xlab = "Gerações",
-             includeMean = FALSE, includeStdDev = FALSE,
-             minGen = 1, maxGen = max(which( cvrp.exec05$best != Inf )) )
+EMF.Gen.Plot(cvrp.exec05, includeWorst = TRUE, title = "Solução para CVRP com operador de reparação. exec.: 5",
+             ylab = "Fitness", xlab = "Gerações")

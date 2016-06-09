@@ -3,16 +3,12 @@ rm(list=ls()) #limpa
 
 ############# #############  ############# 0 : CARREGA O PROBLEMA!
 #problema <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
-#problema1 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
-#problema2 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
-#problema3 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
-#problema3 <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/P-n70-k10.vrp")
 
 
 
 ############# #############  ############# 1 : DEFINE FUNCOES DE CRIACAO E FITNESS!
 cvrp.generate <- function(){
-    #Função para gerar um cromossomo aleatório
+    #Função para gerar um cromossomo aleatório a partir do domínio
     r = sample( problema$cromossomoAmostra );
     return( r );
 }
@@ -72,9 +68,43 @@ cvrp.corrige <- function(c){
     ret = ret[ret %in% problema$cromossomoAmostra];
     #3 - Identifica Adiciona algo que esteja faltando
     falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% ret];
-    if( length(falta) > 1 )
+    if( length(falta) > 1 ){
         ret = c( ret, sample( falta ) );
-    ret = c( ret, falta );
+    }else{
+        ret = c( ret, falta );
+    }
+
+    return ( ret );
+}
+
+cvrp.corrigeNaOrdem <- function(c){
+    #Funcão que recebe um cromossomo "errado" e o corrige, COLOCANDO NA ORDEM
+
+    #1 - Identifica o que está faltando
+    falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% c];
+
+    nFalta = length(falta);
+    #Se nao falta nada, sai
+    if(nFalta == 0 ) return (c);
+
+    #Varre o vetor identificando necessidades de troca
+    ret = c;
+    for(i in 1:length(c)){
+
+    }
+
+
+    #1 - Remove as duplicidades
+    ret = unique(c);
+    #2 - Remove o que não deveria estar no cromossomo
+    ret = ret[ret %in% problema$cromossomoAmostra];
+    #3 - Identifica Adiciona algo que esteja faltando
+    falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% ret];
+    if( length(falta) > 1 ){
+        ret = c( ret, sample( falta ) );
+    }else{
+        ret = c( ret, falta );
+    }
 
     return ( ret );
 }
@@ -95,17 +125,17 @@ cvrp.checkRapido <- function(c){
     return ( TRUE );
 }
 
-cvrp.crossoverBatch <- function( p1, p2  ){
+cvrp.crossover.caixeiro.batch <- function( p1, p2  ){
     #executa um loop de crossover
     linhas = dim(p1)[1];
     ret = NULL;
     for(i in 1:linhas){
-        ret = rbind( ret, cvrp.crossover(p1[i,], p2[i,]) );
+        ret = rbind( ret, cvrp.crossover.caixeiro(p1[i,], p2[i,]) );
     }
     return (ret);
 }
 
-cvrp.crossover <- function( p1, p2  )
+cvrp.crossover.caixeiro <- function( p1, p2  )
 {
     #Funçao de Crossover específico para o problema. Faz um crossover de 2 pontos e garante que não se repete nada
     size = length(p1);
@@ -130,6 +160,17 @@ cvrp.crossover <- function( p1, p2  )
 
     ret = matrix( c(child1, child2), nrow = 2, ncol=size, byrow = TRUE );
     return ( ret );
+}
+
+cvrp.crossover.repara <- function( p1, p2  ){
+    ret = EMF.Gen.CrossOver.Simple( p1, p2 ); #Primeiro, faz o crossover simples de 2 pontos
+
+    nRows = nrow(ret);
+    for(i in 1:nRows){
+        ret[i,] = cvrp.corrige( ret[i,] ) ;
+    }
+
+    return (ret);
 }
 
 
@@ -159,7 +200,7 @@ cvrp.mutate <- function(
     return (ret);
 }
 
-cvrp.mutate2 <- function(
+cvrp.mutate.permut <- function(
     original,
     mutationRate = 0.10,
     chromosomeRandFunc=NULL  )
@@ -182,15 +223,22 @@ cvrp.mutate2 <- function(
 
 
 cvrp.monitor <- function(r){
-    #if( (r$generation >= 10) && ((r$generation %% 10) == 0))
-    #    EMF.Gen.Plot(r, title = "Solução parcial do CVRP", ylab = "Fitness", includeWorst = TRUE);
+    if( (r$generation >= 10) && ((r$generation %% 10) == 0) && (r$worst[r$generation] != Inf))
+    {
+        EMF.Gen.Plot(r, title = "Solução parcial do CVRP", ylab = "Fitness", includeWorst = TRUE);
+    }
 
-    #Para se todos (menos o Elitismo) forem infinitos
-#     if(r$lastEvaluations[r$input.params$elitism+1] == Inf){
-#         EMF.Gen.Plot(r, title = "Interrompida execução. Excesso de indivíduos inválidos", ylab = "Fitness", xlab = "Geração", invert = FALSE, includeWorst = TRUE);
-#         return (TRUE);
-#     }
+    #Para se todos avaliados (menos o Elitismo) forem infinitos
+#      if(r$lastEvaluations[r$input.params$elitism+1] == Inf){
+#          print("Interrompida execução. Excesso de indivíduos inválidos");
+#          return (TRUE);
+#      }
 
+    #Para se todos avaliados (INCLUINDO o Elitismo) forem infinitos
+    if(r$lastEvaluations[1] == Inf){
+        print("Interrompida execução. Excesso de indivíduos inválidos");
+        return (TRUE);
+    }
 
     return (FALSE);
 }
