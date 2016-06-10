@@ -4,16 +4,66 @@ rm(list=ls()) #limpa
 ############# #############  ############# 0 : CARREGA O PROBLEMA!
 #problema <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
 
-
-
 ############# #############  ############# 1 : DEFINE FUNCOES DE CRIACAO E FITNESS!
 cvrp.generate <- function(){
     #Função para gerar um cromossomo aleatório a partir do domínio
-    r = sample( problema$cromossomoAmostra );
+    clientes = sample( problema$clientes );
+
+    cs = list(); #Cria a lista de segmento do cromossomo por veículo (Vazia)
+    for(i in 1:problema$qtdeVeiculos){
+        cs[[i]] = problema$veiculos[i];
+    }
+
+    veiculo = 1;
+    carga = 0;
+
+    for(i in 1:(problema$dimensoes-1)){ #Distribui os clientes em veículos
+        carga = carga + problema$demanda[clientes[i]];
+        if(carga >= problema$capacidadeVeiculos && veiculo < problema$qtdeVeiculos){
+            veiculo = veiculo + 1;
+            carga = problema$demanda[clientes[i]];
+        }
+        cs[[veiculo]] = c( cs[[veiculo]] , clientes[i]);
+    }
+    #r = sample( problema$cromossomoAmostra );
+    r = cvrp.getCromossomoFromRotas(cs);
     return( r );
 }
 
+cvrp.getRotas <- function(c){
+    #Funcao que desmembra o cromossomo e o converte em uma lista de rotas
+    c = c( problema$veiculos[1], c); #Adiciona o Veículo 1, pois o primeiro veículo não é representado no cromossomo
+
+    #encontra as posicoes dos veiculos no cromossomo
+    veiculos = which( c>problema$dimensoes);
+    #Adiciona um separador ponto de segmento final para ganho de performance
+    veiculos = c(veiculos, problema$tamanhoCromossomo + 2 );
+
+    cs = list(); #Cria a lista de segmento do cromossomo por veículo (Vazia)
+    for(i in 1:problema$qtdeVeiculos){
+        cs[[i]] = c[ veiculos[i] : (veiculos[i+1]-1)];
+    }
+
+    return (cs);
+}
+
+cvrp.getCromossomoFromRotas <- function(cs){
+    #Funcão que gera um cromossomo a partir de uma lista de rotas (inverso do cvrp.getRotas)
+    rotas = length(cs);
+    ret = NULL;
+    if(length(cs[[1]]) > 1) #Trata a primeira rota
+        ret = cs[[1]][2:length(cs[[1]])]
+
+    if(rotas > 1){
+        for(i in 2:rotas){
+            ret = c(ret, cs[[i]])
+        }
+    }
+    return (ret);
+}
+
 cvrp.evaluateTruck <- function(cp){
+    #Função para avaliar a rota de 1 único caminhão!
     #Se o veiculo estiver vazio, retorna ZERO.
     if( length(cp) == 1 )
         return ( 0 );
@@ -30,25 +80,17 @@ cvrp.evaluateTruck <- function(cp){
     peso = sum( problema$demanda[rota] );
     over = max( 0, (peso - problema$capacidadeVeiculos)) * problema$gamaOverCapacity;
 
+    #print( paste("Caminhao:", cp[1], "custo:", custo, "peso:", peso) );
+
     return(custo + over);
 }
 
 cvrp.evaluate <- function(c){
-    #Função que avalia o cromossomo (Divide em segmentos e retorna o fitness)
+    #Função que avalia TODO o cromossomo (Divide em segmentos e retorna o fitness)
     if(!cvrp.checkRapido(c))
         return ( Inf );
 
-    c = c( problema$veiculos[1], c); #Adiciona o Veículo 1, pois o primeiro veículo não é representado no cromossomo
-
-    #encontra as posicoes dos veiculos no cromossomo
-    veiculos = which( c>problema$dimensoes);
-    #Adiciona um separador ponto de segmento final para ganho de performance
-    veiculos = c(veiculos, problema$tamanhoCromossomo + 2 );
-
-    cs = list(); #Cria a lista de segmento do cromossomo por veículo (Vazia)
-    for(i in 1:problema$qtdeVeiculos){
-        cs[[i]] = c[ veiculos[i] : (veiculos[i+1]-1)];
-    }
+    cs = cvrp.getRotas(c); #Cria a lista de segmento do cromossomo por veículo (Vazia)
 
     #Loop que totaliza o fitness por veículo
     ret = 0;
@@ -78,7 +120,7 @@ cvrp.corrige <- function(c){
 }
 
 cvrp.corrigeNaOrdem <- function(c){
-    #Funcão que recebe um cromossomo "errado" e o corrige, COLOCANDO NA ORDEM
+    #Funcão que recebe um cromossomo "errado" e o corrige, COLOCANDO NA ORDEM. NAO CONCLUIDO
 
     #1 - Identifica o que está faltando
     falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% c];
@@ -126,7 +168,7 @@ cvrp.checkRapido <- function(c){
 }
 
 cvrp.crossover.caixeiro.batch <- function( p1, p2  ){
-    #executa um loop de crossover
+    #executa um loop de crossover de caixeiro viajante
     linhas = dim(p1)[1];
     ret = NULL;
     for(i in 1:linhas){
@@ -167,7 +209,7 @@ cvrp.crossover.repara <- function( p1, p2  ){
 
     nRows = nrow(ret);
     for(i in 1:nRows){
-        ret[i,] = cvrp.corrige( ret[i,] ) ;
+        ret[i,] = cvrp.corrige( ret[i,] ) ; #E então, repara os descendentes
     }
 
     return (ret);
@@ -217,6 +259,127 @@ cvrp.mutate.permut <- function(
     ret[indices[2]] = original[indices[1]];
 
     return (ret);
+}
+
+cvrp.mutate.change <- function(
+    original,
+    mutationRate = 0.10,
+    chromosomeRandFunc=NULL  )
+{
+    #Get the size of the chromosome
+    size = length(original);
+    ret = original;
+
+    #Escolhe 2 posições: 1 gene do cromossomo e determina 1 local onde ele será inserido
+    indices = sample(1:size, 2);
+    escolhido = indices[1];
+    novaposicao = indices[2];
+
+    #prepare the return, sem o cromossomo removido
+    temp = original[-escolhido];
+
+    #Insere no final
+    if(novaposicao == size){
+        ret = c(temp, original[escolhido]);
+    }else if(novaposicao == 1){#insere no início
+        ret = c(original[escolhido], temp);
+    }else{#Insere no meio
+        ret = c( temp[1:(novaposicao-1)], original[escolhido] , temp[novaposicao:(size-1)]);
+    }
+
+    return (ret);
+}
+
+cvrp.mutate.composto <- function(
+    original,
+    mutationRate = 0.10,
+    chromosomeRandFunc=NULL  )
+{
+    #Verifica se deve mutar apenas dentro do cromossomo.
+    ret = NULL;
+    chance = runif(1, 0, 1);
+
+    if(chance<= 0.40){ #40% para alterar dentro da rota
+        cs = cvrp.getRotas(c = original);
+        idRotaAlterar = sample(problema$qtdeVeiculos, 1);
+        rotaAlterar = cs[[idRotaAlterar]];
+        if(length(rotaAlterar) >2){
+            trocas = sample(2:length(rotaAlterar), 2);
+
+            cs[[idRotaAlterar]][trocas[1]] = rotaAlterar[trocas[2]];
+            cs[[idRotaAlterar]][trocas[2]] = rotaAlterar[trocas[1]];
+        }
+        ret = cvrp.getCromossomoFromRotas(cs);
+        #print(cs);
+    }else{
+        ret = cvrp.mutate.permut(original);
+    }
+
+    return (ret);
+}
+
+
+cvrp.mutate.srm <- function(
+    original,
+    mutationRate = 0.10,
+    chromosomeRandFunc=NULL  )
+{
+    #baseado no artigo de 2004, escolhe um determinado cliente e tenta melhorá-lo na própria rota ou em outras rotas
+    ret = NULL;
+    chance = runif(1, 0, 1);
+
+    #Obtem as rotas e escolhe uma a alterar (rota deve possuir mais que 1 entrega)
+    cs = cvrp.getRotas(c = original);
+    idRotaRemover = sample(problema$qtdeVeiculos, 1);
+    rotaRemover = cs[[idRotaRemover]];
+    idRotaInserir = 0;
+    rotaInserir = NULL;
+    while(length(rotaRemover) <=2){
+        idRotaRemover = sample(problema$qtdeVeiculos, 1);
+        rotaRemover = cs[[idRotaRemover]];
+    }
+
+    #Remove algum indivíduo da rota
+    idItemRemover = sample(2:length(rotaRemover), size = 1);
+    itemRemovido = rotaRemover[idItemRemover];
+    rotaRemover = rotaRemover[-idItemRemover];
+
+    #Tem 30% de chance de inserir na própria rota, senão escolhe outra
+    if(chance <= 0.30){
+        idRotaInserir = idRotaRemover;
+        rotaInserir = rotaRemover;
+    }else{
+        idRotaInserir = sample((1:problema$qtdeVeiculos)[-idRotaRemover], 1, 1);
+        rotaInserir = cs[[idRotaInserir]];
+    }
+
+    rotaInserir = cvrp.bestInsertion(rotaInserir, itemRemovido); #Insere na "Best Insertion"
+
+    #Atualiza o array de rotas
+    cs[[idRotaRemover]] = rotaRemover;
+    cs[[idRotaInserir]] = rotaInserir;
+
+    return (cvrp.getCromossomoFromRotas(cs));
+}
+
+cvrp.bestInsertion <- function(rotaInserir, itemInserir){
+    #Insere no melhor lugar da rota
+    if(length(rotaInserir) <= 2) #Rotas de 0 ou 1 entrega, insere no final
+        return ( c(rotaInserir, itemInserir) );
+
+    melhorRota = NULL;
+    melhorFitness = Inf;
+    for(i in 2:(length(rotaInserir) +1)){
+        rotaCandidata = c( rotaInserir[1:(i-1)], itemInserir );
+        if(i < (length(rotaInserir) +1))
+            rotaCandidata = c( rotaCandidata, rotaInserir[(i):length(rotaInserir)]);
+
+        fitnessCandidato = cvrp.evaluateTruck(rotaCandidata);
+        if(fitnessCandidato < melhorFitness)
+            melhorRota = rotaCandidata;
+    }
+
+    return (melhorRota);
 }
 
 #a = c(35,36,13,32,9,27,14,10,19,43,12,26,1,2,34,23,8,15,20,22,5,29,3,25,16,6,11,37,28,18,4,42,17,30,7,33,24,31,41,21,39,40)
