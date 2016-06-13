@@ -1,26 +1,28 @@
-#Exibe os gráficos na tela
-EMF.Gen.Plot(cvrp.exec01, includeWorst = TRUE, title = "Solução para CVRP com operadores específicos. exec.: 1", ylab = "Fitness", xlab = "Gerações",
-             includeMean = TRUE, includeStdDev = TRUE,
-             minGen = 1, maxGen = max(which( cvrp.exec01$best != Inf )))
-EMF.Gen.Plot(cvrp.exec02, includeWorst = TRUE, title = "Solução para CVRP com operadores específicos. exec.: 2", ylab = "Fitness", xlab = "Gerações",
-             includeMean = TRUE, includeStdDev = TRUE,
-             minGen = 1, maxGen = max(which( cvrp.exec02$best != Inf )))
-EMF.Gen.Plot(cvrp.exec03, includeWorst = TRUE, title = "Solução para CVRP com operadores específicos. exec.: 3", ylab = "Fitness", xlab = "Gerações",
-             includeMean = TRUE, includeStdDev = TRUE,
-             minGen = 1, maxGen = max(which( cvrp.exec03$best != Inf )))
-EMF.Gen.Plot(cvrp.exec04, includeWorst = TRUE, title = "Solução para CVRP com operadores específicos. exec.: 4", ylab = "Fitness", xlab = "Gerações",
-             includeMean = TRUE, includeStdDev = TRUE,
-             minGen = 1, maxGen = max(which( cvrp.exec04$best != Inf )))
-EMF.Gen.Plot(cvrp.exec05, includeWorst = TRUE, title = "Solução para CVRP com operadores específicos. exec.: 5", ylab = "Fitness", xlab = "Gerações",
-             includeMean = TRUE, includeStdDev = TRUE,
-             minGen = 1, maxGen = max(which( cvrp.exec05$best != Inf )))
+all = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#Se quiser armazenar, descomente a linha abaixo e nomeia a variável!
+#rodada1 = all;
+#rodada2 = all;
+#rodada3 = all;
+#Se quiser recuperar, descomente a linha abaixo e nomeia a variável
+#all = rodada1
+#all = rodada2
+#all = rodada3
 
+#LOG: rodada1 - 1 a 6 do problema A-n33-k5
+#LOG: rodada2 - 1 a 6 do problema A-n33-k5
+
+
+#Exibe os gráficos na tela, escolha o índice!
+indice = 1;
+EMF.Gen.Plot(all[[indice]], includeWorst = TRUE, title = paste( "Solução para CVRP com operadores específicos. exec.:", indice), ylab = "Fitness", xlab = "Gerações",
+             includeMean = TRUE, includeStdDev = TRUE,
+             minGen = 1, maxGen = max(which( all[[indice]]$best != Inf )))
+rm(indice);
 
 
 #Variações
 
 #Grava os logs e imagens
-all = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05);
 all.frame = data.frame();
 
 
@@ -31,7 +33,7 @@ for(i in 1:length(all)){
     if(i < 10) istring = paste("0", istring, sep="");
 
 #     EMF.Gen.LogStatistics(execData = all[[i]],
-#                           execName = paste("Função CVRP com operadores específicos ", istring, sep=""),
+#                           execName = paste("CVRP operadores específicos ", istring, sep=""),
 #                           fileName = paste("cvrpClassicos", istring, sep=""),
 #                           title = paste("Solução para CVRP com operadores específicos. exec.:", i),
 #                           ylab = "Fitness", xlab = "Gerações", includeWorst = FALSE, includeMean = FALSE, includeStdDev = FALSE,
@@ -48,6 +50,7 @@ for(i in 1:length(all)){
                         temp$input.params$clone,
                         temp$input.params$cloneAndMutate,
                         temp$input.params$elitism,
+                        min(temp$best[1:100], na.rm = TRUE),
                         min(temp$best, na.rm = TRUE),
                         which ( temp$best == min(temp$best, na.rm = TRUE) )[1]
                       )
@@ -57,7 +60,7 @@ for(i in 1:length(all)){
 }
 rm(i);
 
-colnames(all.frame) <- c("Execução", "População", "Iterações Plan", "Iterações Exec", "CrossOver", "Chance Mutação Cross", "Clone", "Mutação", "Elitismo", "Melhor Resultado", "Geração Melhor");
+colnames(all.frame) <- c("Execução", "População", "Iterações Plan", "Iterações Exec", "CrossOver", "Chance Mutação Cross", "Clone", "Mutação", "Elitismo", "Melhor em 100", "Melhor Resultado", "Geração Melhor");
 
 
 rm(all);

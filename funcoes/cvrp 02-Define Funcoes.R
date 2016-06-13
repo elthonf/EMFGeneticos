@@ -140,6 +140,24 @@ cvrp.corrige <- function(c){
     return ( ret );
 }
 
+cvrp.corrigeTruck <- function(cp){
+    #Funcão que recebe uma rota de um veículo e determina o MENOR trajeto UNICAMENTE DA ROTA
+    #A função sempre avalia a menor distância entre os endereços, a partir do depósito
+
+    if(length(cp) <= 3 ) #Até 2 entregas (caminhao+2) não faz diferença a ordem
+        return (cp);
+
+    enderecosOrdenar = cp[2:length(cp)];
+    ret = cp[1]; #Sempre inicia com o caminhao
+
+    #Insere cliente a cliente na melhor opção
+    for( j in 1:length(enderecosOrdenar)){
+        ret = cvrp.bestInsertion(ret, enderecosOrdenar[j]);
+    }
+
+    return ( ret );
+}
+
 cvrp.corrigeNaOrdem <- function(c){
     #Funcão que recebe um cromossomo "errado" e o corrige, COLOCANDO NA ORDEM. NAO CONCLUIDO
 
@@ -150,7 +168,7 @@ cvrp.corrigeNaOrdem <- function(c){
     #Se nao falta nada, sai
     if(nFalta == 0 ) return (c);
 
-    #Varre o vetor identificando necessidades de troca
+    #Varre o vetor identificando necessidades de troca, NAO TERMINEI!
     ret = c;
     for(i in 1:length(c)){
 
@@ -391,13 +409,16 @@ cvrp.bestInsertion <- function(rotaInserir, itemInserir){
     melhorRota = NULL;
     melhorFitness = Inf;
     for(i in 2:(length(rotaInserir) +1)){
-        rotaCandidata = c( rotaInserir[1:(i-1)], itemInserir );
-        if(i < (length(rotaInserir) +1))
-            rotaCandidata = c( rotaCandidata, rotaInserir[(i):length(rotaInserir)]);
+        esqIndex = 1:(i-1);
+        dirIndex = (i):length(rotaInserir);
+        if(i == length(rotaInserir) +1) dirIndex = NULL;
 
+        rotaCandidata = c( rotaInserir[esqIndex], itemInserir,  rotaInserir[dirIndex]);
         fitnessCandidato = cvrp.evaluateTruck(rotaCandidata);
-        if(fitnessCandidato < melhorFitness)
+        if(fitnessCandidato < melhorFitness){
+            melhorFitness = fitnessCandidato;
             melhorRota = rotaCandidata;
+        }
     }
 
     return (melhorRota);
@@ -426,5 +447,3 @@ cvrp.monitor <- function(r){
 
     return (FALSE);
 }
-
-
