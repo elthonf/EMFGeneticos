@@ -30,6 +30,27 @@ cvrp.generate <- function(){
     return( r );
 }
 
+cvrp.generate.bestInsertion <- function(){
+    #Função para gerar um cromossomo aleatório a partir do domínio
+    clientes = sample( problema$clientes );
+    veiculos = sample( problema$veiculos, size = problema$dimensoes-1, replace = TRUE)
+
+    cs = list(); #Cria a lista de segmento do cromossomo por veículo (Vazia)
+    for(i in 1:problema$qtdeVeiculos){
+        cs[[i]] = problema$veiculos[i];
+        clientesRota = clientes[ veiculos == problema$veiculos[i] ];
+        if(length(clientesRota) > 0)
+            for( j in 1:length(clientesRota)){
+                cs[[i]] = cvrp.bestInsertion(cs[[i]], clientesRota[j]);
+            }
+    }
+
+    #r = sample( problema$cromossomoAmostra );
+    r = cvrp.getCromossomoFromRotas(cs);
+    return( r );
+}
+
+
 cvrp.getRotas <- function(c){
     #Funcao que desmembra o cromossomo e o converte em uma lista de rotas
     c = c( problema$veiculos[1], c); #Adiciona o Veículo 1, pois o primeiro veículo não é representado no cromossomo
@@ -167,17 +188,17 @@ cvrp.checkRapido <- function(c){
     return ( TRUE );
 }
 
-cvrp.crossover.caixeiro.batch <- function( p1, p2  ){
+cvrp.crossover.pmx.batch <- function( p1, p2  ){
     #executa um loop de crossover de caixeiro viajante
     linhas = dim(p1)[1];
     ret = NULL;
     for(i in 1:linhas){
-        ret = rbind( ret, cvrp.crossover.caixeiro(p1[i,], p2[i,]) );
+        ret = rbind( ret, cvrp.crossover.pmx(p1[i,], p2[i,]) );
     }
     return (ret);
 }
 
-cvrp.crossover.caixeiro <- function( p1, p2  )
+cvrp.crossover.pmx <- function( p1, p2  )
 {
     #Funçao de Crossover específico para o problema. Faz um crossover de 2 pontos e garante que não se repete nada
     size = length(p1);
