@@ -7,7 +7,7 @@ prob3 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/B-n38-k6.vrp", gamaOverCapacity = 5
 prob5 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/P-n21-k2.vrp", gamaOverCapacity = 50)  #SIM
 #prob6 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/P-n70-k10.vrp", gamaOverCapacity = 50)
 
-problema = prob5; #Setar qual problema será trabalhado.
+problema = prob3; #Setar qual problema será trabalhado.
 
 
 cat( "Estatégia 1: População média: 1000" );
@@ -168,7 +168,18 @@ cvrp.exec08 <- EMF.Gen.Workflow(
     parentProb = dnorm(1:popSize, mean=1, sd=(popSize/2)),
     verbose = FALSE)
 
+#An33k5.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#An33k5.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#An33k5.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#Bn38k6.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+Bn38k6.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#Bn38k6.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 
-Pn21k2.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#Pn21k2.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05 , cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Pn21k2.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Pn21k2.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#An80k10.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#An80k10.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#An80k10.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#rm( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08)
+

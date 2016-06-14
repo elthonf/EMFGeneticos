@@ -1,12 +1,8 @@
-all = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#all = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Se quiser armazenar, descomente a linha abaixo e nomeia a variável!
-#rodada1 = all;
-#rodada2 = all;
-#rodada3 = all;
+#rodadaX = all;
 #Se quiser recuperar, descomente a linha abaixo e nomeia a variável
-#all = rodada1
-#all = rodada2
-#all = rodada3
+all = Bn38k6.rodada1;
 
 #LOG: rodada1 - 1 a 6 do problema A-n33-k5
 #LOG: rodada2 - 1 a 6 do problema A-n33-k5
