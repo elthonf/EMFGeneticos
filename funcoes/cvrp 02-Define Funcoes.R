@@ -5,8 +5,15 @@ rm(list=ls()) #limpa
 #problema <- EMF.Gen.Cvrp.LoadProblem(filename = "tests/cvrp/A-n37-k6.vrp")
 
 ############# #############  ############# 1 : DEFINE FUNCOES DE CRIACAO E FITNESS!
+cvrp.generate.simples <- function(){
+    #Função para gerar um cromossomo aleatório a partir do domínio, sem nenhuma inteligencia
+
+    r = sample( problema$cromossomoAmostra );
+    return( r );
+}
+
 cvrp.generate <- function(){
-    #Função para gerar um cromossomo aleatório a partir do domínio
+    #Função para gerar um cromossomo aleatório a partir do domínio, com distribuição para os veículos
     clientes = sample( problema$clientes );
 
     cs = list(); #Cria a lista de segmento do cromossomo por veículo (Vazia)
@@ -31,7 +38,7 @@ cvrp.generate <- function(){
 }
 
 cvrp.generate.bestInsertion <- function(){
-    #Função para gerar um cromossomo aleatório a partir do domínio
+    #Função para gerar um cromossomo aleatório a partir do domínio com melhor posicionamento (não foi utilizado)
     clientes = sample( problema$clientes );
     veiculos = sample( problema$veiculos, size = problema$dimensoes-1, replace = TRUE)
 
@@ -84,7 +91,7 @@ cvrp.getCromossomoFromRotas <- function(cs){
 }
 
 cvrp.evaluateTruck <- function(cp){
-    #Função para avaliar a rota de 1 único caminhão!
+    #Função para avaliar a rota de 1 único veículo!
     #Se o veiculo estiver vazio, retorna ZERO.
     if( length(cp) == 1 )
         return ( 0 );
@@ -143,6 +150,7 @@ cvrp.corrige <- function(c){
 cvrp.corrigeTruck <- function(cp){
     #Funcão que recebe uma rota de um veículo e determina o MENOR trajeto UNICAMENTE DA ROTA
     #A função sempre avalia a menor distância entre os endereços, a partir do depósito
+    #Esta função foi utilizada apenas para testes e não nos problemas do relatório
 
     if(length(cp) <= 3 ) #Até 2 entregas (caminhao+2) não faz diferença a ordem
         return (cp);
@@ -153,38 +161,6 @@ cvrp.corrigeTruck <- function(cp){
     #Insere cliente a cliente na melhor opção
     for( j in 1:length(enderecosOrdenar)){
         ret = cvrp.bestInsertion(ret, enderecosOrdenar[j]);
-    }
-
-    return ( ret );
-}
-
-cvrp.corrigeNaOrdem <- function(c){
-    #Funcão que recebe um cromossomo "errado" e o corrige, COLOCANDO NA ORDEM. NAO CONCLUIDO
-
-    #1 - Identifica o que está faltando
-    falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% c];
-
-    nFalta = length(falta);
-    #Se nao falta nada, sai
-    if(nFalta == 0 ) return (c);
-
-    #Varre o vetor identificando necessidades de troca, NAO TERMINEI!
-    ret = c;
-    for(i in 1:length(c)){
-
-    }
-
-
-    #1 - Remove as duplicidades
-    ret = unique(c);
-    #2 - Remove o que não deveria estar no cromossomo
-    ret = ret[ret %in% problema$cromossomoAmostra];
-    #3 - Identifica Adiciona algo que esteja faltando
-    falta = problema$cromossomoAmostra[ ! problema$cromossomoAmostra %in% ret];
-    if( length(falta) > 1 ){
-        ret = c( ret, sample( falta ) );
-    }else{
-        ret = c( ret, falta );
     }
 
     return ( ret );
@@ -207,7 +183,7 @@ cvrp.checkRapido <- function(c){
 }
 
 cvrp.crossover.pmx.batch <- function( p1, p2  ){
-    #executa um loop de crossover de caixeiro viajante
+    #executa um loop de crossover PMX, para performance
     linhas = dim(p1)[1];
     ret = NULL;
     for(i in 1:linhas){
@@ -260,6 +236,8 @@ cvrp.mutate <- function(
     mutationRate = 0.10,
     chromosomeRandFunc=NULL  )
 {
+    #Função com mutação simples, o que danifica o cromossomo. Não foi utilizada
+
     #Get the size of the chromosome
     size = length(original);
 
@@ -286,6 +264,8 @@ cvrp.mutate.permut <- function(
     mutationRate = 0.10,
     chromosomeRandFunc=NULL  )
 {
+    #Permuta de posição, 2 genes do cromossomo.
+
     #Get the size of the chromosome
     size = length(original);
 
@@ -305,6 +285,7 @@ cvrp.mutate.change <- function(
     mutationRate = 0.10,
     chromosomeRandFunc=NULL  )
 {
+    #Similar à permutaçñao, mas move um bloco de genes. Não foi utilizada.
     #Get the size of the chromosome
     size = length(original);
     ret = original;
@@ -334,6 +315,8 @@ cvrp.mutate.composto <- function(
     mutationRate = 0.10,
     chromosomeRandFunc=NULL  )
 {
+    #Um híbrido de mutaçñao. Não foi utilizada.
+
     #Verifica se deve mutar apenas dentro do cromossomo.
     ret = NULL;
     chance = runif(1, 0, 1);
@@ -384,14 +367,18 @@ cvrp.mutate.srm <- function(
     rotaRemover = rotaRemover[-idItemRemover];
 
     #Tem 30% de chance de inserir na própria rota, senão escolhe outra
-    if(chance <= 0.30){
+    if(chance <= 0.30 || problema$qtdeVeiculos < 2 ){
         idRotaInserir = idRotaRemover;
         rotaInserir = rotaRemover;
+    }else if(problema$qtdeVeiculos == 2){
+        idRotaInserir = (1:problema$qtdeVeiculos)[-idRotaRemover];
+        rotaInserir = cs[[idRotaInserir]];
     }else{
-        idRotaInserir = sample((1:problema$qtdeVeiculos)[-idRotaRemover], 1, 1);
+        idRotaInserir = sample((1:problema$qtdeVeiculos)[-idRotaRemover], size = 1);
         rotaInserir = cs[[idRotaInserir]];
     }
 
+    #print(paste("idRotaRemover:", idRotaRemover, ", idItemRemover:", idItemRemover, ", idRotaInserir:", idRotaInserir, ",chance:", chance));
     rotaInserir = cvrp.bestInsertion(rotaInserir, itemRemovido); #Insere na "Best Insertion"
 
     #Atualiza o array de rotas
@@ -402,7 +389,7 @@ cvrp.mutate.srm <- function(
 }
 
 cvrp.bestInsertion <- function(rotaInserir, itemInserir){
-    #Insere no melhor lugar da rota
+    #Insere no melhor lugar da rota. Serve de apoio ao SRM ou a qualquer outra utilizacao
     if(length(rotaInserir) <= 2) #Rotas de 0 ou 1 entrega, insere no final
         return ( c(rotaInserir, itemInserir) );
 
@@ -424,10 +411,9 @@ cvrp.bestInsertion <- function(rotaInserir, itemInserir){
     return (melhorRota);
 }
 
-#a = c(35,36,13,32,9,27,14,10,19,43,12,26,1,2,34,23,8,15,20,22,5,29,3,25,16,6,11,37,28,18,4,42,17,30,7,33,24,31,41,21,39,40)
-
 
 cvrp.monitor <- function(r){
+    #Função que monitora a execução e plota gráficos
     if( (r$generation >= 10) && ((r$generation %% 10) == 0) && (r$worst[r$generation] != Inf))
     {
         EMF.Gen.Plot(r, title = "Solução parcial do CVRP", ylab = "Fitness", includeWorst = TRUE);

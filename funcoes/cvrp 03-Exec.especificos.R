@@ -1,15 +1,10 @@
+#Carrega os problemas
+prob.An33k5 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/A-n33-k5.vrp", gamaOverCapacity = 50)  #SIM
+prob.An80k10 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/A-n80-k10.vrp", gamaOverCapacity = 50) #SIM
+prob.Bn38k6 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/B-n38-k6.vrp", gamaOverCapacity = 50)  #SIM
+prob.Pn21k2 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/P-n21-k2.vrp", gamaOverCapacity = 50)  #SIM
 
-#BENCHMARK
-prob1 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/A-n33-k5.vrp", gamaOverCapacity = 50)  #SIM
-prob2 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/A-n80-k10.vrp", gamaOverCapacity = 50) #SIM
-prob3 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/B-n38-k6.vrp", gamaOverCapacity = 50)  #SIM
-#prob4 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/B-n68-k9.vrp", gamaOverCapacity = 50)
-prob5 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/P-n21-k2.vrp", gamaOverCapacity = 50)  #SIM
-#prob6 = EMF.Gen.Cvrp.LoadProblem("tests/cvrp/P-n70-k10.vrp", gamaOverCapacity = 50)
-
-problema = prob3; #Setar qual problema será trabalhado.
-
-
+problema = prob.Bn38k6; #Setar qual problema será trabalhado!
 cat( "Estatégia 1: População média: 1000" );
 popSize = 1000;
 cvrp.exec01 <- EMF.Gen.Workflow(
@@ -149,7 +144,7 @@ cvrp.exec07 <- EMF.Gen.Workflow(
     parentProb = dnorm(1:popSize, mean=1, sd=(popSize/2)),
     verbose = FALSE)
 
-cat( "Estatégia 8: Melhores parametros: SRM, aumento de mutação, elitismo, etc." );
+cat( "Estatégia 8: Melhores parametros do problema!: AJUSTAR POR PROBLEMA!!" );
 popSize = 1000;
 cvrp.exec08 <- EMF.Gen.Workflow(
     iters = 1000,
@@ -168,18 +163,18 @@ cvrp.exec08 <- EMF.Gen.Workflow(
     parentProb = dnorm(1:popSize, mean=1, sd=(popSize/2)),
     verbose = FALSE)
 
+#Setar qual rodada será armazenada!
 #An33k5.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #An33k5.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #An33k5.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Bn38k6.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
-Bn38k6.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#Bn38k6.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Bn38k6.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
-
-#Pn21k2.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05 , cvrp.exec06, cvrp.exec07, cvrp.exec08);
+#Pn21k2.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Pn21k2.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #Pn21k2.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #An80k10.rodada1 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #An80k10.rodada2 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
 #An80k10.rodada3 = list( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08);
-#rm( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08)
+#rm( cvrp.exec01, cvrp.exec02, cvrp.exec03, cvrp.exec04.2c, cvrp.exec05, cvrp.exec06, cvrp.exec07, cvrp.exec08)
 
